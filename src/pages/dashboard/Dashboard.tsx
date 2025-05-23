@@ -1,8 +1,9 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageCircle, Calendar, FileText, Users } from 'lucide-react';
+import { MessageCircle, Calendar, FileText, Users, Activity, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import MetricCard from '@/components/dashboard/MetricCard';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -10,66 +11,42 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">Bem-vindo ao Optivoo CRM</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total de Contatos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">54</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              +8% em relação ao mês passado
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Mensagens Novas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              +2 nas últimas 24 horas
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Propostas Enviadas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              3 visualizadas, 2 aceitas
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Leads Quentes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">15</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              +25% em relação ao mês passado
-            </p>
-          </CardContent>
-        </Card>
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          title="Total de Contatos"
+          value={54}
+          subtitle="+8% em relação ao mês passado"
+          icon={Users}
+          trend={{ value: "+8%", isPositive: true }}
+        />
+        <MetricCard
+          title="Mensagens Novas"
+          value={12}
+          subtitle="+2 nas últimas 24 horas"
+          icon={MessageCircle}
+          trend={{ value: "+2", isPositive: true }}
+        />
+        <MetricCard
+          title="Propostas Enviadas"
+          value={8}
+          subtitle="3 visualizadas, 2 aceitas"
+          icon={FileText}
+        />
+        <MetricCard
+          title="Leads Quentes"
+          value={15}
+          subtitle="+25% em relação ao mês passado"
+          icon={TrendingUp}
+          trend={{ value: "+25%", isPositive: true }}
+        />
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Atividades recentes</CardTitle>
@@ -80,41 +57,41 @@ const Dashboard = () => {
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-2 rounded-full">
+                <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
                   <MessageCircle className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium">Nova mensagem de Maria Silva</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">Nova mensagem de Maria Silva</p>
                   <p className="text-xs text-muted-foreground">Há 30 minutos</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-2 rounded-full">
+                <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
                   <Calendar className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium">Reunião agendada com João Santos</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">Reunião agendada com João Santos</p>
                   <p className="text-xs text-muted-foreground">Hoje às 15:00</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-2 rounded-full">
+                <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium">Proposta de Marketing Digital visualizada</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">Proposta de Marketing Digital visualizada</p>
                   <p className="text-xs text-muted-foreground">Ontem às 14:25</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-2 rounded-full">
+                <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
                   <Users className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium">Novo contato adicionado: Ana Pereira</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">Novo contato adicionado: Ana Pereira</p>
                   <p className="text-xs text-muted-foreground">Ontem às 10:12</p>
                 </div>
               </div>
@@ -138,7 +115,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/dashboard/whatsapp')}
                 >
                   <MessageCircle className="h-6 w-6 text-primary" />
-                  <span>Conversas</span>
+                  <span className="text-xs sm:text-sm">Conversas</span>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -146,7 +123,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/dashboard/contacts')}
                 >
                   <Users className="h-6 w-6 text-primary" />
-                  <span>Contatos</span>
+                  <span className="text-xs sm:text-sm">Contatos</span>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -154,7 +131,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/dashboard/proposals')}
                 >
                   <FileText className="h-6 w-6 text-primary" />
-                  <span>Propostas</span>
+                  <span className="text-xs sm:text-sm">Propostas</span>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -162,7 +139,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/dashboard/calendar')}
                 >
                   <Calendar className="h-6 w-6 text-primary" />
-                  <span>Agenda</span>
+                  <span className="text-xs sm:text-sm">Agenda</span>
                 </Button>
               </div>
             </CardContent>
@@ -170,16 +147,31 @@ const Dashboard = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle>Dicas do assistente IA</CardTitle>
+              <CardTitle>Status do Sistema</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-secondary/10 rounded-lg p-4 border border-secondary/20">
-                <p className="text-sm italic">
-                  "Com base nas suas últimas conversas, 3 clientes estão esperando um retorno sobre os serviços de marketing digital. Considere enviar uma proposta personalizada."
-                </p>
-                <Button variant="link" className="text-secondary p-0 h-auto mt-2">
-                  Ver detalhes no assistente
-                </Button>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">WhatsApp API</span>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <span className="text-xs text-muted-foreground">Online</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Assistente IA</span>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <span className="text-xs text-muted-foreground">Online</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Backup</span>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
+                    <span className="text-xs text-muted-foreground">Em andamento</span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

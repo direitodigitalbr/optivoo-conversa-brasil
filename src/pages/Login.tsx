@@ -12,10 +12,12 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { login, isLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,15 +27,15 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-accent to-background p-4">
-      <div className="w-full max-w-md animate-fade-in">
+      <div className="w-full max-w-sm sm:max-w-md animate-fade-in">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-primary">Optivoo CRM</h1>
-          <p className="text-muted-foreground">Gerencie seus contatos e conversas</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary">Optivoo CRM</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">Gerencie seus contatos e conversas</p>
         </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Entrar</CardTitle>
+        <Card className="shadow-lg">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-xl sm:text-2xl">Entrar</CardTitle>
             <CardDescription>
               Acesse sua conta para continuar
             </CardDescription>
@@ -49,32 +51,43 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="h-11"
                 />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Senha</Label>
-                  <a 
-                    href="#" 
-                    className="text-xs text-primary hover:underline"
+                  <button 
+                    type="button"
+                    className="text-xs text-primary hover:underline focus:outline-none"
                   >
                     Esqueceu a senha?
-                  </a>
+                  </button>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="h-11 pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full"
+                className="w-full h-11"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -84,16 +97,16 @@ const Login = () => {
                   </span>
                 ) : "Entrar"}
               </Button>
+              
+              <div className="text-center text-sm text-muted-foreground">
+                Não tem uma conta?{' '}
+                <button className="text-primary hover:underline focus:outline-none">
+                  Fale conosco
+                </button>
+              </div>
             </CardFooter>
           </form>
         </Card>
-        
-        <div className="text-center mt-4 text-sm text-muted-foreground">
-          Não tem uma conta?{' '}
-          <a href="#" className="text-primary hover:underline">
-            Fale conosco
-          </a>
-        </div>
       </div>
     </div>
   );

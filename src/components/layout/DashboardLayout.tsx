@@ -10,7 +10,6 @@ const DashboardLayout = () => {
   const { sidebarOpen } = useApp();
 
   useEffect(() => {
-    // Set document title
     document.title = 'Dashboard | Optivoo CRM';
   }, []);
 
@@ -21,10 +20,14 @@ const DashboardLayout = () => {
       <main 
         className={cn(
           "pt-16 min-h-screen transition-all duration-300 ease-in-out",
-          sidebarOpen ? "ml-64" : "ml-16"
+          // Mobile: always full width with padding
+          "px-4 lg:px-0",
+          // Desktop: adjust margin based on sidebar state
+          "lg:ml-16",
+          sidebarOpen && "lg:ml-64"
         )}
       >
-        <div className="container px-4 py-6 mx-auto">
+        <div className="container mx-auto py-4 lg:py-6 lg:px-4">
           <Outlet />
         </div>
       </main>
