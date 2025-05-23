@@ -41,7 +41,7 @@ import {
   MoreVertical, 
   UserPlus, 
   Filter,
-  Fire,
+  Flame,
   Snowflake
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -91,8 +91,8 @@ const mockContacts = [
 ];
 
 const tagLabels: Record<string, { label: string, icon: React.ElementType }> = {
-  hot: { label: 'Quente', icon: Fire },
-  warm: { label: 'Morno', icon: Fire },
+  hot: { label: 'Quente', icon: Flame },
+  warm: { label: 'Morno', icon: Flame },
   cold: { label: 'Frio', icon: Snowflake }
 };
 
@@ -193,7 +193,7 @@ const Contacts = () => {
                     className="flex-1"
                     onClick={() => setNewContact({...newContact, tag: 'hot'})}
                   >
-                    <Fire size={16} className="mr-1" /> Quente
+                    <Flame size={16} className="mr-1" /> Quente
                   </Button>
                   <Button
                     type="button"
@@ -201,7 +201,7 @@ const Contacts = () => {
                     className="flex-1"
                     onClick={() => setNewContact({...newContact, tag: 'warm'})}
                   >
-                    <Fire size={16} className="mr-1" /> Morno
+                    <Flame size={16} className="mr-1" /> Morno
                   </Button>
                   <Button
                     type="button"
@@ -304,7 +304,7 @@ const Contacts = () => {
                           className={`bg-tag-${contact.tag}/10 text-tag-${contact.tag} border-tag-${contact.tag}/20 flex w-fit gap-1 items-center`}
                         >
                           {contact.tag === 'hot' || contact.tag === 'warm' ? (
-                            <Fire size={12} />
+                            <Flame size={12} />
                           ) : (
                             <Snowflake size={12} />
                           )}
