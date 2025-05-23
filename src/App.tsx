@@ -3,8 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -32,106 +31,98 @@ import Settings from "./pages/dashboard/Settings";
 
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
-
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <AppProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              {/* Landing Page */}
-              <Route path="/" element={<Landing />} />
+  <AppProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <Routes>
+        {/* Landing Page */}
+        <Route path="/" element={<Landing />} />
 
-              {/* Auth Routes */}
-              <Route
-                path="/login"
-                element={
-                  <ProtectedRoute requireAuth={false}>
-                    <Login />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/signup"
-                element={
-                  <ProtectedRoute requireAuth={false}>
-                    <Signup />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/forgot-password"
-                element={
-                  <ProtectedRoute requireAuth={false}>
-                    <ForgotPassword />
-                  </ProtectedRoute>
-                }
-              />
+        {/* Auth Routes */}
+        <Route
+          path="/login"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <Login />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <Signup />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <ForgotPassword />
+            </ProtectedRoute>
+          }
+        />
 
-              {/* Onboarding Routes */}
-              <Route
-                path="/onboarding/sector"
-                element={
-                  <ProtectedRoute>
-                    <SectorSelection />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/onboarding/tone"
-                element={
-                  <ProtectedRoute>
-                    <ToneSelection />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/onboarding/hours"
-                element={
-                  <ProtectedRoute>
-                    <BusinessHours />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/onboarding/support"
-                element={
-                  <ProtectedRoute>
-                    <SupportType />
-                  </ProtectedRoute>
-                }
-              />
+        {/* Onboarding Routes */}
+        <Route
+          path="/onboarding/sector"
+          element={
+            <ProtectedRoute>
+              <SectorSelection />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/onboarding/tone"
+          element={
+            <ProtectedRoute>
+              <ToneSelection />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/onboarding/hours"
+          element={
+            <ProtectedRoute>
+              <BusinessHours />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/onboarding/support"
+          element={
+            <ProtectedRoute>
+              <SupportType />
+            </ProtectedRoute>
+          }
+        />
 
-              {/* Dashboard Routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Dashboard />} />
-                <Route path="contacts" element={<Contacts />} />
-                <Route path="whatsapp" element={<WhatsApp />} />
-                <Route path="proposals" element={<Proposals />} />
-                <Route path="calendar" element={<Calendar />} />
-                <Route path="ai-assistant" element={<AIAssistant />} />
-                <Route path="settings" element={<Settings />} />
-              </Route>
-              
-              {/* 404 Not Found */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </TooltipProvider>
-        </AppProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
+        {/* Dashboard Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="contacts" element={<Contacts />} />
+          <Route path="whatsapp" element={<WhatsApp />} />
+          <Route path="proposals" element={<Proposals />} />
+          <Route path="calendar" element={<Calendar />} />
+          <Route path="ai-assistant" element={<AIAssistant />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+        
+        {/* 404 Not Found */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </TooltipProvider>
+  </AppProvider>
 );
 
 export default App;
