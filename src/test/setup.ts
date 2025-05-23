@@ -1,5 +1,6 @@
 
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 
 // Setup global test environment
 Object.defineProperty(window, 'matchMedia', {
