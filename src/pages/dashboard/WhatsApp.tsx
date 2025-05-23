@@ -25,7 +25,8 @@ import {
   MoreVertical, 
   Phone,
   Image,
-  FileText
+  FileText,
+  MessageCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 

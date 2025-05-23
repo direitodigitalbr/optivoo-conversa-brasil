@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -50,13 +49,28 @@ const Settings = () => {
     key: string,
     value: string | boolean
   ) => {
-    setFormValues((prev) => ({
-      ...prev,
-      [parent]: {
-        ...prev[parent as keyof typeof prev],
-        [key]: value,
-      },
-    }));
+    setFormValues((prev) => {
+      const parentObj = prev[parent as keyof typeof prev];
+      
+      // Fix: Ensure parentObj is treated as an object before spreading
+      if (typeof parentObj === 'object' && parentObj !== null) {
+        return {
+          ...prev,
+          [parent]: {
+            ...parentObj,
+            [key]: value,
+          },
+        };
+      }
+      
+      // If not an object, handle differently
+      return {
+        ...prev,
+        [parent]: {
+          [key]: value,
+        },
+      };
+    });
   };
 
   const handleSaveProfile = () => {
