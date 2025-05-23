@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +26,7 @@ import WhatsApp from "./pages/dashboard/WhatsApp";
 import Proposals from "./pages/dashboard/Proposals";
 import Calendar from "./pages/dashboard/Calendar";
 import AIAssistant from "./pages/dashboard/AIAssistant";
+import Analytics from "./pages/dashboard/Analytics";
 import Settings from "./pages/dashboard/Settings";
 
 import NotFound from "./pages/NotFound";
@@ -115,6 +115,7 @@ const App = () => (
           <Route path="proposals" element={<Proposals />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="ai-assistant" element={<AIAssistant />} />
+          <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
         </Route>
         

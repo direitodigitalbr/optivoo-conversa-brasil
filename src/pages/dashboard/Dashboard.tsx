@@ -1,9 +1,11 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageCircle, Calendar, FileText, Users, Activity, TrendingUp } from 'lucide-react';
+import { MessageCircle, Calendar, FileText, Users, Activity, TrendingUp, BarChart3, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MetricCard from '@/components/dashboard/MetricCard';
+import SmartActions from '@/components/smart/SmartActions';
+import { EnhancedCard } from '@/components/ui/enhanced-card';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Bem-vindo ao Optivoo CRM</p>
+        <p className="text-muted-foreground">Bem-vindo ao Optivoo CRM com IA</p>
       </div>
       
       {/* Metrics Grid */}
@@ -38,23 +40,22 @@ const Dashboard = () => {
           icon={FileText}
         />
         <MetricCard
-          title="Leads Quentes"
-          value={15}
-          subtitle="+25% em relação ao mês passado"
+          title="Sentimento Positivo"
+          value="78%"
+          subtitle="+5% em relação ao mês passado"
           icon={TrendingUp}
-          trend={{ value: "+25%", isPositive: true }}
+          trend={{ value: "+5%", isPositive: true }}
         />
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Atividades recentes</CardTitle>
-            <CardDescription>
-              Acompanhe as últimas interações com os clientes
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <EnhancedCard
+            title="Atividades recentes"
+            description="Acompanhe as últimas interações com os clientes"
+            hover={true}
+            gradient={true}
+          >
             <div className="space-y-4">
               <div className="flex items-start gap-4">
                 <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
@@ -96,85 +97,88 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </EnhancedCard>
+          
+          <EnhancedCard
+            title="Acesso rápido"
+            description="Principais funcionalidades do sistema"
+            interactive={true}
+          >
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <Button 
+                variant="outline" 
+                className="h-auto py-4 flex flex-col items-center justify-center gap-2"
+                onClick={() => navigate('/dashboard/whatsapp')}
+              >
+                <MessageCircle className="h-6 w-6 text-primary" />
+                <span className="text-xs sm:text-sm">Conversas</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto py-4 flex flex-col items-center justify-center gap-2"
+                onClick={() => navigate('/dashboard/contacts')}
+              >
+                <Users className="h-6 w-6 text-primary" />
+                <span className="text-xs sm:text-sm">Contatos</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto py-4 flex flex-col items-center justify-center gap-2"
+                onClick={() => navigate('/dashboard/proposals')}
+              >
+                <FileText className="h-6 w-6 text-primary" />
+                <span className="text-xs sm:text-sm">Propostas</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto py-4 flex flex-col items-center justify-center gap-2"
+                onClick={() => navigate('/dashboard/analytics')}
+              >
+                <BarChart3 className="h-6 w-6 text-primary" />
+                <span className="text-xs sm:text-sm">Analytics</span>
+              </Button>
+            </div>
+          </EnhancedCard>
+        </div>
         
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Acesso rápido</CardTitle>
-              <CardDescription>
-                Principais funcionalidades do sistema
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-3">
-                <Button 
-                  variant="outline" 
-                  className="h-auto py-4 flex flex-col items-center justify-center gap-2"
-                  onClick={() => navigate('/dashboard/whatsapp')}
-                >
-                  <MessageCircle className="h-6 w-6 text-primary" />
-                  <span className="text-xs sm:text-sm">Conversas</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto py-4 flex flex-col items-center justify-center gap-2"
-                  onClick={() => navigate('/dashboard/contacts')}
-                >
-                  <Users className="h-6 w-6 text-primary" />
-                  <span className="text-xs sm:text-sm">Contatos</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto py-4 flex flex-col items-center justify-center gap-2"
-                  onClick={() => navigate('/dashboard/proposals')}
-                >
-                  <FileText className="h-6 w-6 text-primary" />
-                  <span className="text-xs sm:text-sm">Propostas</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto py-4 flex flex-col items-center justify-center gap-2"
-                  onClick={() => navigate('/dashboard/calendar')}
-                >
-                  <Calendar className="h-6 w-6 text-primary" />
-                  <span className="text-xs sm:text-sm">Agenda</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <SmartActions context="dashboard" />
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Status do Sistema</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">WhatsApp API</span>
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                    <span className="text-xs text-muted-foreground">Online</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Assistente IA</span>
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                    <span className="text-xs text-muted-foreground">Online</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Backup</span>
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
-                    <span className="text-xs text-muted-foreground">Em andamento</span>
-                  </div>
+          <EnhancedCard
+            title="Status do Sistema"
+            badge={{ text: "Tudo Funcionando", variant: "default" }}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">WhatsApp API</span>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  <span className="text-xs text-muted-foreground">Online</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Assistente IA</span>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  <span className="text-xs text-muted-foreground">Online</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Análise de Sentimento</span>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  <span className="text-xs text-muted-foreground">Ativo</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Backup</span>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
+                  <span className="text-xs text-muted-foreground">Em andamento</span>
+                </div>
+              </div>
+            </div>
+          </EnhancedCard>
         </div>
       </div>
     </div>
