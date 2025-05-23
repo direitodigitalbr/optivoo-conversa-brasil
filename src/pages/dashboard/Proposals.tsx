@@ -311,9 +311,11 @@ const Proposals = () => {
                         <TableCell>
                           <div className="flex items-center gap-1">
                             {statusLabels[proposal.status].icon && (
-                              <statusLabels[proposal.status].icon
-                                className={`h-4 w-4 ${statusLabels[proposal.status].className}`}
-                              />
+                              <div className={`h-4 w-4 ${statusLabels[proposal.status].className}`}>
+                                {React.createElement(statusLabels[proposal.status].icon, {
+                                  className: `h-4 w-4 ${statusLabels[proposal.status].className}`
+                                })}
+                              </div>
                             )}
                             <span className="text-sm">{statusLabels[proposal.status].label}</span>
                           </div>
