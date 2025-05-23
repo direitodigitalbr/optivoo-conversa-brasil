@@ -1,0 +1,61 @@
+
+/* WhatsApp Message Bubble Styles */
+.message-bubble {
+  transition: all 0.2s ease;
+}
+
+.outgoing-message {
+  @apply bg-primary text-primary-foreground ml-auto;
+}
+
+.incoming-message {
+  @apply bg-muted text-foreground mr-auto;
+}
+
+/* Dark mode adjustments */
+.dark .incoming-message {
+  @apply bg-muted/80;
+}
+
+.dark .outgoing-message {
+  @apply bg-primary/90;
+}
+
+/* Message status indicators */
+.message-status {
+  @apply flex items-center gap-1 text-xs opacity-70;
+}
+
+/* Conversation list styles */
+.conversation-item {
+  @apply transition-colors hover:bg-accent/50;
+}
+
+.dark .conversation-item:hover {
+  @apply bg-accent/30;
+}
+
+/* Contact card hover effects */
+.contact-card {
+  @apply transition-all duration-200 hover:shadow-md hover:scale-[1.02];
+}
+
+.dark .contact-card:hover {
+  @apply hover:shadow-xl hover:shadow-black/20;
+}
+
+/* Loading animations */
+.loading-pulse {
+  @apply animate-pulse bg-gradient-to-r from-muted via-muted/50 to-muted;
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
