@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -57,12 +58,12 @@ const Login = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Senha</Label>
-                  <button 
-                    type="button"
+                  <Link 
+                    to="/forgot-password"
                     className="text-xs text-primary hover:underline focus:outline-none"
                   >
                     Esqueceu a senha?
-                  </button>
+                  </Link>
                 </div>
                 <div className="relative">
                   <Input
@@ -100,9 +101,9 @@ const Login = () => {
               
               <div className="text-center text-sm text-muted-foreground">
                 Não tem uma conta?{' '}
-                <button className="text-primary hover:underline focus:outline-none">
-                  Fale conosco
-                </button>
+                <Link to="/signup" className="text-primary hover:underline focus:outline-none">
+                  Criar conta
+                </Link>
               </div>
             </CardFooter>
           </form>

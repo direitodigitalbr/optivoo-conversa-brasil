@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,84 +24,14 @@ import {
   Paperclip, 
   MoreVertical, 
   Phone,
-  Image,
-  FileText,
   MessageCircle
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import MessageComposer from '@/components/whatsapp/MessageComposer';
-
-// Mock data
-const mockContacts = [
-  {
-    id: '1',
-    name: 'Maria Silva',
-    phone: '11 99999-9999',
-    lastMessage: 'Olá, gostaria de saber mais sobre seus serviços.',
-    time: '10:45',
-    unread: 2,
-    online: true,
-    tag: 'hot'
-  },
-  {
-    id: '2',
-    name: 'João Santos',
-    phone: '11 88888-8888',
-    lastMessage: 'Quando podemos marcar uma reunião?',
-    time: 'Ontem',
-    unread: 0,
-    online: false,
-    tag: 'warm'
-  },
-  {
-    id: '3',
-    name: 'Ana Pereira',
-    phone: '11 77777-7777',
-    lastMessage: 'Obrigado pelo atendimento!',
-    time: 'Ontem',
-    unread: 0,
-    online: false,
-    tag: 'cold'
-  },
-];
-
-const mockMessages = [
-  {
-    id: '1',
-    contactId: '1',
-    text: 'Olá, gostaria de saber mais sobre seus serviços.',
-    time: '10:30',
-    sender: 'contact'
-  },
-  {
-    id: '2',
-    contactId: '1',
-    text: 'Estou interessada no pacote de marketing digital.',
-    time: '10:32',
-    sender: 'contact'
-  },
-  {
-    id: '3',
-    contactId: '1',
-    text: 'Olá Maria! Tudo bem? Agradeço seu interesse em nossos serviços.',
-    time: '10:35',
-    sender: 'user'
-  },
-  {
-    id: '4',
-    contactId: '1',
-    text: 'Nosso pacote de marketing digital inclui gestão de redes sociais, SEO e campanhas pagas. Gostaria de receber uma proposta?',
-    time: '10:36',
-    sender: 'user'
-  },
-  {
-    id: '5',
-    contactId: '1',
-    text: 'Sim, por favor. Qual seria o valor?',
-    time: '10:44',
-    sender: 'contact'
-  }
-];
+import ConversationList from '@/components/whatsapp/ConversationList';
+import MessageBubble from '@/components/whatsapp/MessageBubble';
+import { messagesApi, contactsApi } from '@/services/mockApi';
+import { mockContacts, mockMessages } from '@/data/mockData';
+import { toast } from 'sonner';
 
 const WhatsApp = () => {
   const [selectedContact, setSelectedContact] = useState<string | null>(null);
@@ -132,27 +63,52 @@ const WhatsApp = () => {
   }, [contactMessages]);
   
   // Send a new message
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim() === '' || !selectedContact) return;
     
-    const newMsg = {
-      id: (messages.length + 1).toString(),
-      contactId: selectedContact,
-      text: newMessage,
-      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-      sender: 'user' as const
-    };
-    
-    setMessages([...messages, newMsg]);
-    setNewMessage('');
-    
-    // Update contact's last message
-    setContacts(contacts.map(contact => 
-      contact.id === selectedContact 
-        ? { ...contact, lastMessage: newMessage, time: 'Agora', unread: 0 }
-        : contact
-    ));
+    try {
+      const sentMessage = await messagesApi.send(selectedContact, newMessage);
+      setMessages([...messages, sentMessage]);
+      setNewMessage('');
+      
+      // Update contact's last message
+      setContacts(contacts.map(contact => 
+        contact.id === selectedContact 
+          ? { ...contact, lastMessage: newMessage, lastMessageTime: 'Agora', unreadCount: 0 }
+          : contact
+      ));
+      
+      toast.success('Mensagem enviada!');
+    } catch (error) {
+      toast.error('Erro ao enviar mensagem');
+    }
   };
+
+  const handleSelectConversation = async (contactId: string) => {
+    setSelectedContact(contactId);
+    
+    // Mark messages as read
+    try {
+      await messagesApi.markAsRead(contactId);
+      setContacts(contacts.map(contact => 
+        contact.id === contactId ? { ...contact, unreadCount: 0 } : contact
+      ));
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
+  // Convert contacts to conversation format
+  const conversations = filteredContacts.map(contact => ({
+    id: contact.id,
+    name: contact.name,
+    phone: contact.phone,
+    lastMessage: contact.lastMessage || 'Nenhuma mensagem ainda',
+    time: contact.lastMessageTime || '',
+    unread: contact.unreadCount,
+    online: contact.online,
+    tag: contact.tag
+  }));
 
   return (
     <div className="space-y-4">
@@ -170,78 +126,15 @@ const WhatsApp = () => {
         <TabsContent value="conversations" className="mt-4">
           <div className="h-[calc(100vh-12rem)]">
             <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4 h-full">
-              {/* Contacts sidebar */}
+              {/* Conversations sidebar */}
               <div className="lg:col-span-1 h-full">
-                <Card className="h-full flex flex-col">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Conversas</CardTitle>
-                  </CardHeader>
-                  <div className="px-4 pb-2">
-                    <Input
-                      placeholder="Buscar contato"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="mb-2"
-                    />
-                  </div>
-                  <CardContent className="flex-1 overflow-y-auto p-0">
-                    <div className="space-y-1">
-                      {filteredContacts.map((contact) => (
-                        <div
-                          key={contact.id}
-                          className={`p-3 cursor-pointer hover:bg-muted flex justify-between ${
-                            selectedContact === contact.id ? 'bg-muted' : ''
-                          }`}
-                          onClick={() => {
-                            setSelectedContact(contact.id);
-                            setContacts(contacts.map(c => 
-                              c.id === contact.id ? { ...c, unread: 0 } : c
-                            ));
-                          }}
-                        >
-                          <div className="flex gap-3 items-center min-w-0 flex-1">
-                            <div className="relative flex-shrink-0">
-                              <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
-                                {contact.name.slice(0, 2)}
-                              </div>
-                              {contact.online && (
-                                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-background"></span>
-                              )}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium text-sm truncate">{contact.name}</p>
-                                {contact.tag && (
-                                  <Badge variant="outline" className="text-xs px-1 py-0 h-4">
-                                    {contact.tag === 'hot' ? 'Quente' : 
-                                     contact.tag === 'warm' ? 'Morno' : 'Frio'}
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {contact.lastMessage}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-xs text-muted-foreground flex flex-col items-end flex-shrink-0">
-                            <span>{contact.time}</span>
-                            {contact.unread > 0 && (
-                              <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center mt-1">
-                                {contact.unread}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                      
-                      {filteredContacts.length === 0 && (
-                        <div className="p-4 text-center text-muted-foreground">
-                          Nenhum contato encontrado
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <ConversationList
+                  conversations={conversations}
+                  selectedId={selectedContact}
+                  searchTerm={searchTerm}
+                  onSearchChange={setSearchTerm}
+                  onSelectConversation={handleSelectConversation}
+                />
               </div>
               
               {/* Chat area */}
@@ -294,29 +187,17 @@ const WhatsApp = () => {
                     </CardHeader>
                     
                     {/* Chat messages */}
-                    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-accent/20">
+                    <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-accent/20">
                       {contactMessages.map((message) => (
-                        <div 
-                          key={message.id} 
-                          className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                        >
-                          <div 
-                            className={`message-bubble ${
-                              message.sender === 'user' 
-                                ? 'outgoing-message' 
-                                : 'incoming-message'
-                            }`}
-                          >
-                            <p>{message.text}</p>
-                            <p className={`text-xs mt-1 text-right ${
-                              message.sender === 'user' 
-                                ? 'text-primary-foreground/80' 
-                                : 'text-muted-foreground'
-                            }`}>
-                              {message.time}
-                            </p>
-                          </div>
-                        </div>
+                        <MessageBubble
+                          key={message.id}
+                          id={message.id}
+                          text={message.text}
+                          time={message.time}
+                          sender={message.sender}
+                          status={message.status}
+                          contactName={message.sender === 'contact' ? contactData?.name : undefined}
+                        />
                       ))}
                       <div ref={messagesEndRef} />
                     </div>

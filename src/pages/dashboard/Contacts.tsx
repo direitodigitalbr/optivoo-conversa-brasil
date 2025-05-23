@@ -1,355 +1,216 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle 
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Label } from '@/components/ui/label';
-import { 
-  PlusCircle, 
-  Search, 
-  MoreVertical, 
-  UserPlus, 
-  Filter,
-  Flame,
-  Snowflake
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-
-// Mock data for initial contacts
-const mockContacts = [
-  {
-    id: '1',
-    name: 'Maria Silva',
-    email: 'maria@exemplo.com',
-    phone: '11 99999-9999',
-    status: 'active',
-    tag: 'hot'
-  },
-  {
-    id: '2',
-    name: 'João Santos',
-    email: 'joao@exemplo.com',
-    phone: '11 88888-8888',
-    status: 'active',
-    tag: 'warm'
-  },
-  {
-    id: '3',
-    name: 'Ana Pereira',
-    email: 'ana@exemplo.com',
-    phone: '11 77777-7777',
-    status: 'inactive',
-    tag: 'cold'
-  },
-  {
-    id: '4',
-    name: 'Carlos Oliveira',
-    email: 'carlos@exemplo.com',
-    phone: '11 66666-6666',
-    status: 'active',
-    tag: 'hot'
-  },
-  {
-    id: '5',
-    name: 'Mariana Costa',
-    email: 'mariana@exemplo.com',
-    phone: '11 55555-5555',
-    status: 'active',
-    tag: 'cold'
-  }
-];
-
-const tagLabels: Record<string, { label: string, icon: React.ElementType }> = {
-  hot: { label: 'Quente', icon: Flame },
-  warm: { label: 'Morno', icon: Flame },
-  cold: { label: 'Frio', icon: Snowflake }
-};
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, Search, Filter } from 'lucide-react';
+import { toast } from 'sonner';
+import ContactCard from '@/components/contacts/ContactCard';
+import { contactsApi } from '@/services/mockApi';
+import { Contact } from '@/data/mockData';
 
 const Contacts = () => {
-  const [contacts, setContacts] = useState(mockContacts);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [newContact, setNewContact] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    tag: 'warm'
-  });
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
 
-  const handleAddContact = () => {
-    const contact = {
-      id: (contacts.length + 1).toString(),
-      ...newContact,
-      status: 'active'
-    };
-    
-    setContacts([...contacts, contact]);
-    setNewContact({ name: '', email: '', phone: '', tag: 'warm' });
-    setIsAddDialogOpen(false);
+  useEffect(() => {
+    loadContacts();
+  }, []);
+
+  useEffect(() => {
+    // Filter contacts based on search term
+    if (searchTerm.trim() === '') {
+      setFilteredContacts(contacts);
+    } else {
+      const filtered = contacts.filter(contact =>
+        contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.company?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredContacts(filtered);
+    }
+  }, [contacts, searchTerm]);
+
+  const loadContacts = async () => {
+    try {
+      setIsLoading(true);
+      const data = await contactsApi.getAll();
+      setContacts(data);
+    } catch (error) {
+      toast.error('Erro ao carregar contatos');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const filteredContacts = contacts.filter(contact => {
-    const matchesSearch = (
-      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.phone.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleCall = (contactId: string) => {
+    const contact = contacts.find(c => c.id === contactId);
+    if (contact) {
+      toast.info(`Iniciando chamada para ${contact.name}`);
+      // Here you would integrate with a calling service
+    }
+  };
+
+  const handleMessage = (contactId: string) => {
+    const contact = contacts.find(c => c.id === contactId);
+    if (contact) {
+      toast.info(`Abrindo conversa com ${contact.name}`);
+      // Here you would navigate to WhatsApp page with the contact selected
+    }
+  };
+
+  const handleEdit = (contactId: string) => {
+    const contact = contacts.find(c => c.id === contactId);
+    if (contact) {
+      toast.info(`Editando contato: ${contact.name}`);
+      // Here you would open an edit modal or navigate to edit page
+    }
+  };
+
+  const handleDelete = async (contactId: string) => {
+    try {
+      await contactsApi.delete(contactId);
+      setContacts(contacts.filter(c => c.id !== contactId));
+      toast.success('Contato excluído com sucesso');
+    } catch (error) {
+      toast.error('Erro ao excluir contato');
+    }
+  };
+
+  const getTagCounts = () => {
+    const hot = contacts.filter(c => c.tag === 'hot').length;
+    const warm = contacts.filter(c => c.tag === 'warm').length;
+    const cold = contacts.filter(c => c.tag === 'cold').length;
+    return { hot, warm, cold };
+  };
+
+  const tagCounts = getTagCounts();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Contatos</h1>
+          <p className="text-muted-foreground">Gerencie todos seus contatos</p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin h-8 w-8 border-2 border-primary border-opacity-20 border-t-primary rounded-full"></div>
+        </div>
+      </div>
     );
-    
-    const matchesStatus = statusFilter === 'all' || contact.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Contatos</h1>
-          <p className="text-muted-foreground">Gerencie seus contatos e leads</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">Contatos</h1>
+          <p className="text-muted-foreground">Gerencie todos seus contatos ({contacts.length} total)</p>
         </div>
         
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <UserPlus size={16} />
-              Adicionar Contato
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Adicionar novo contato</DialogTitle>
-              <DialogDescription>
-                Preencha as informações do novo contato abaixo.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome</Label>
-                <Input
-                  id="name"
-                  value={newContact.name}
-                  onChange={(e) => setNewContact({...newContact, name: e.target.value})}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={newContact.email}
-                  onChange={(e) => setNewContact({...newContact, email: e.target.value})}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  value={newContact.phone}
-                  onChange={(e) => setNewContact({...newContact, phone: e.target.value})}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Qualificação</Label>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant={newContact.tag === 'hot' ? 'default' : 'outline'}
-                    className="flex-1"
-                    onClick={() => setNewContact({...newContact, tag: 'hot'})}
-                  >
-                    <Flame size={16} className="mr-1" /> Quente
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={newContact.tag === 'warm' ? 'default' : 'outline'}
-                    className="flex-1"
-                    onClick={() => setNewContact({...newContact, tag: 'warm'})}
-                  >
-                    <Flame size={16} className="mr-1" /> Morno
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={newContact.tag === 'cold' ? 'default' : 'outline'}
-                    className="flex-1"
-                    onClick={() => setNewContact({...newContact, tag: 'cold'})}
-                  >
-                    <Snowflake size={16} className="mr-1" /> Frio
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            <DialogFooter>
-              <Button 
-                variant="outline" 
-                onClick={() => setIsAddDialogOpen(false)}
-              >
-                Cancelar
-              </Button>
-              <Button onClick={handleAddContact}>Adicionar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button className="sm:w-auto">
+          <Plus className="mr-2 h-4 w-4" />
+          Novo Contato
+        </Button>
       </div>
-      
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-red-600">{tagCounts.hot}</div>
+            <p className="text-xs text-muted-foreground">Leads Quentes</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-yellow-600">{tagCounts.warm}</div>
+            <p className="text-xs text-muted-foreground">Leads Mornos</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-blue-600">{tagCounts.cold}</div>
+            <p className="text-xs text-muted-foreground">Leads Frios</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold">{contacts.length}</div>
+            <p className="text-xs text-muted-foreground">Total de Contatos</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Filters */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle>Lista de contatos</CardTitle>
-          <CardDescription>
-            Total de {contacts.length} contatos, {filteredContacts.length} exibidos
-          </CardDescription>
+        <CardHeader>
+          <CardTitle className="text-lg">Pesquisar Contatos</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
               <Input
-                placeholder="Buscar por nome, email ou telefone"
-                className="pl-8"
+                placeholder="Buscar por nome, telefone, email ou empresa..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
               />
             </div>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Filter size={16} />
-                  Filtrar
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>Status</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={() => setStatusFilter('all')}
-                  className={statusFilter === 'all' ? 'bg-accent text-accent-foreground' : ''}
-                >
-                  Todos
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setStatusFilter('active')}
-                  className={statusFilter === 'active' ? 'bg-accent text-accent-foreground' : ''}
-                >
-                  Ativos
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setStatusFilter('inactive')}
-                  className={statusFilter === 'inactive' ? 'bg-accent text-accent-foreground' : ''}
-                >
-                  Inativos
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          
-          <div className="border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  <TableHead>Tag</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[80px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredContacts.length > 0 ? (
-                  filteredContacts.map((contact) => (
-                    <TableRow key={contact.id}>
-                      <TableCell className="font-medium">{contact.name}</TableCell>
-                      <TableCell>{contact.email}</TableCell>
-                      <TableCell>{contact.phone}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={`bg-tag-${contact.tag}/10 text-tag-${contact.tag} border-tag-${contact.tag}/20 flex w-fit gap-1 items-center`}
-                        >
-                          {contact.tag === 'hot' || contact.tag === 'warm' ? (
-                            <Flame size={12} />
-                          ) : (
-                            <Snowflake size={12} />
-                          )}
-                          {tagLabels[contact.tag]?.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={contact.status === 'active' ? 'default' : 'secondary'}
-                          className="w-fit"
-                        >
-                          {contact.status === 'active' ? 'Ativo' : 'Inativo'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Editar</DropdownMenuItem>
-                            <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                      Nenhum contato encontrado
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+            <Button variant="outline" className="sm:w-auto">
+              <Filter className="mr-2 h-4 w-4" />
+              Filtros
+            </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Contacts List */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+        {filteredContacts.map((contact) => (
+          <ContactCard
+            key={contact.id}
+            id={contact.id}
+            name={contact.name}
+            phone={contact.phone}
+            email={contact.email}
+            company={contact.company}
+            tag={contact.tag}
+            lastMessage={contact.lastMessage}
+            lastMessageTime={contact.lastMessageTime}
+            unreadCount={contact.unreadCount}
+            onCall={handleCall}
+            onMessage={handleMessage}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
+      </div>
+
+      {filteredContacts.length === 0 && (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Search className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Nenhum contato encontrado</h3>
+            <p className="text-muted-foreground text-center max-w-md">
+              {searchTerm 
+                ? 'Tente ajustar sua pesquisa ou limpar os filtros' 
+                : 'Comece adicionando seu primeiro contato'
+              }
+            </p>
+            {!searchTerm && (
+              <Button className="mt-4">
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar Primeiro Contato
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
